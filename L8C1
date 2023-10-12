@@ -1,0 +1,63 @@
+# Connect over TCP to the following server: 'localhost', 10000
+# Initiate communication with 'GET' to retrieve the encrypted messages.
+# Then return the messages decrypted to the server,
+# taking care to ensure each message is split on to a newline
+# Connect over TCP to the following server 'localhost', 10000
+# Initiate communication with GET to retrieve the encrypted messages.
+# Then return the messages decrypted to the server,
+# taking care to ensure each message is split on to a newline
+
+import socket
+
+def caesar_cipher_decrypt(text, offset):
+    decrypted = ''
+    for char in text:
+        if char.isalpha():
+            shifted = ord(char) - offset
+            if char.islower():
+                if shifted < ord('a'):
+                    shifted += 26
+            else:
+                if shifted < ord('A'):
+                    shifted += 26
+            decrypted += chr(shifted)
+        else:
+            decrypted += char
+    return decrypted
+
+def main():
+    server_address = ('localhost', 10000)
+
+    try:
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            s.connect(server_address)
+            s.send(b'GET')
+            response = s.recv(1024).decode()
+
+            # Split the response into sentences
+            sentences = response.split('\n')
+
+            # Assuming 3 sentences are received
+            decrypted_sentences = []
+            for i in range(3):
+                offset = ord(sentences[i][0]) - ord('A')
+                decrypted_sentence = caesar_cipher_decrypt(sentences[i], offset)
+                decrypted_sentences.append(decrypted_sentence)
+
+            flag = '\n'.join(decrypted_sentences)
+
+            print("Decrypted Messages:")
+            for sentence in decrypted_sentences:
+                print(sentence)
+
+            print("\nFlag:")
+            print(flag)
+    except Exception as e:
+        print(f"An error occurred: {e}")
+
+if __name__ == '__main__':
+    main()
+
+
+if __name__ == '__main__':
+    main()
